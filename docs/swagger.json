@@ -1,0 +1,57 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "School Administration & Learning Platform API",
+    "version": "1.0.0",
+    "description": "Unified API contracts across all microservices (Auth, Academic, Attendance, Billing, Comms, AI Copilot)"
+  },
+  "paths": {
+    "/auth/health": { "get": { "summary": "Auth Health", "responses": { "200": { "description": "OK" } } } },
+    "/auth/login": {
+      "post": {
+        "summary": "User Login",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object", "properties": { "username": { "type": "string" }, "role": { "type": "string" } } } } }
+        },
+        "responses": { "200": { "description": "Returns JWT token" } }
+      }
+    },
+    "/academic/health": { "get": { "summary": "Academic Health", "responses": { "200": { "description": "OK" } } } },
+    "/academic/courses": {
+      "get": { "summary": "List Courses", "responses": { "200": { "description": "Array of courses" } } },
+      "post": {
+        "summary": "Create Course",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "title": { "type": "string" }, "teacher": { "type": "string" } } } } } },
+        "responses": { "201": { "description": "Course created" } }
+      }
+    },
+    "/academic/assignments": { "get": { "summary": "List Assignments", "responses": { "200": { "description": "Array of assignments" } } } },
+    "/attendance/health": { "get": { "summary": "Attendance Health", "responses": { "200": { "description": "OK" } } } },
+    "/attendance/{classId}": {
+      "get": {
+        "summary": "Get Attendance by Class",
+        "parameters": [{ "name": "classId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Attendance records" } }
+      }
+    },
+    "/attendance/mark": {
+      "post": {
+        "summary": "Mark Attendance",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "classId": { "type": "string" }, "studentId": { "type": "string" }, "status": { "type": "string" } } } } } },
+        "responses": { "201": { "description": "Attendance recorded" } }
+      }
+    },
+    "/billing/health": { "get": { "summary": "Billing Health", "responses": { "200": { "description": "OK" } } } },
+    "/billing/invoices": { "get": { "summary": "List Invoices", "responses": { "200": { "description": "Invoices array" } } } },
+    "/comms/health": { "get": { "summary": "Comms Health", "responses": { "200": { "description": "OK" } } } },
+    "/comms/notices": { "get": { "summary": "List Broadcast Notices", "responses": { "200": { "description": "Array of notices" } } } },
+    "/ai/generate": {
+      "post": {
+        "summary": "AI Copilot Generation (qwen2.5-coder:7b)",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "role": { "type": "string" }, "prompt": { "type": "string" } } } } } },
+        "responses": { "200": { "description": "LLM response text" } }
+      }
+    }
+  }
+}

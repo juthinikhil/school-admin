@@ -5,7 +5,7 @@ app.use(express.json());
 
 let notices = [
   { id: 1, title: 'Term Finals Schedule', target: 'All', message: 'Final exams begin November 15th.', date: '2026-10-20' },
-  { id: 2, title: 'Teacher-Parent Conference', target: 'Parents', message: 'Annual meeting this Friday at 4 PM.', date: '2026-10-22' }
+  { id: 2, title: 'Parent-Teacher Meeting', target: 'Parents', message: 'Quarterly review conference Friday at 4 PM.', date: '2026-10-22' }
 ];
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'comms-service' }));

@@ -3,13 +3,15 @@ services:
     build: ./frontend
     ports:
       - "3000:80"
-    depends_on:
-      - auth-service
-      - academic-service
-      - attendance-service
-      - billing-service
-      - comms-service
-      - ai-service
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8081:8080"
+    environment:
+      - SWAGGER_JSON=/spec/swagger.json
+    volumes:
+      - ./docs/swagger.json:/spec/swagger.json
 
   auth-service:
     build: ./auth-service
@@ -17,6 +19,8 @@ services:
       - "4000:4000"
     environment:
       - PORT=4000
+      - DATABASE_URL=postgresql://user:password@postgres:5432/identity_db
+      - JWT_SECRET=school-admin-secret-key
 
   academic-service:
     build: ./academic-service
@@ -24,6 +28,7 @@ services:
       - "4001:4001"
     environment:
       - PORT=4001
+      - DATABASE_URL=postgresql://user:password@postgres:5432/academic_db
 
   attendance-service:
     build: ./attendance-service
@@ -31,6 +36,8 @@ services:
       - "4002:4002"
     environment:
       - PORT=4002
+      - DATABASE_URL=postgresql://user:password@postgres:5432/attendance_db
+      - REDIS_URL=redis://redis:6379
 
   billing-service:
     build: ./billing-service
@@ -38,6 +45,7 @@ services:
       - "4003:4003"
     environment:
       - PORT=4003
+      - DATABASE_URL=postgresql://user:password@postgres:5432/billing_db
 
   comms-service:
     build: ./comms-service
