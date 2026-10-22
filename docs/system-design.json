@@ -1,0 +1,126 @@
+{
+  "system_design": {
+    "project_name": "School Administration & Learning Platform",
+    "version": "1.0.0",
+    "client_layer": {
+      "frontends": ["Web (Next.js)", "Mobile (Flutter / Mobile App)"],
+      "protocols": ["HTTPS", "WSS"]
+    },
+    "ingress_layer": {
+      "gateway": "Kong / Traefik API Gateway",
+      "features": ["TLS termination", "Request validation", "Rate limiting", "RBAC token inspection", "Tenant routing"]
+    },
+    "rbac_roles": [
+      {
+        "role": "Principal",
+        "responsibilities": "School-wide analytics, staff management, financial tracking, approvals, policy broadcasts, compliance.",
+        "permissions": "Global read/write, user management, audit logs, administrative approvals."
+      },
+      {
+        "role": "Teacher",
+        "responsibilities": "Class rosters, grade book, daily attendance tracking, lesson planning, student feedback, homework assignment.",
+        "permissions": "Class-bounded read/write (assigned classrooms & enrolled students only)."
+      },
+      {
+        "role": "Parent",
+        "responsibilities": "Student performance monitoring, attendance alerts, fee invoice/payment, direct teacher messaging.",
+        "permissions": "Child-bounded read access, payment submission, messaging initiation."
+      },
+      {
+        "role": "Student",
+        "responsibilities": "Coursework access, homework submission, exam schedules, learning materials, report cards.",
+        "permissions": "Self-bounded read access, assignment upload/submission."
+      }
+    ],
+    "microservices": [
+      {
+        "name": "Auth & Identity Service",
+        "protocol": ["OAuth2", "JWT"],
+        "database": "identity_db (PostgreSQL)",
+        "scope": "Multi-tenant credentials, role hierarchies (Principal -> Teacher -> Student/Parent links), session invalidation, parent-child association graphs."
+      },
+      {
+        "name": "Academic & Grading Service",
+        "protocol": ["REST", "gRPC"],
+        "database": "academic_db (PostgreSQL)",
+        "scope": "Subject catalogs, syllabus schedules, assignment creation, grading rubrics, gradebook exports."
+      },
+      {
+        "name": "Attendance & Operations Service",
+        "protocol": ["REST"],
+        "database": "attendance_db (PostgreSQL)",
+        "scope": "Ingests daily attendance logs (manual or biometric/RFID), school calendars, timetables, leave management."
+      },
+      {
+        "name": "Communication & Notification Service",
+        "protocol": ["WebSockets", "Push Alerts"],
+        "broker": "Redis / RabbitMQ",
+        "scope": "Real-time push alerts, emergency SMS broadcasts, parent-teacher messaging via WebSockets, scheduled email reports."
+      },
+      {
+        "name": "Fee & Billing Service",
+        "protocol": ["REST"],
+        "database": "billing_db (PostgreSQL)",
+        "scope": "Tuition schedules, invoice generation, payment gateway integration, receipt reconciliation."
+      }
+    ],
+    "storage_architecture": {
+      "transactional_db": "PostgreSQL (Database-Per-Service pattern)",
+      "cache_and_realtime": "Redis (Session tokens, active attendance caches, Pub/Sub message broker)",
+      "object_storage": "MinIO / S3 (Homework uploads, report card PDFs, lesson plans, system backups)"
+    }
+  },
+  "ai_architecture": {
+    "gateway": {
+      "name": "AI Inference Gateway",
+      "routing_criteria": ["Privacy", "Latency", "Context budget"]
+    },
+    "agents": [
+      {
+        "name": "Principal Copilot (Institutional Health & Risk Analytics)",
+        "capabilities": [
+          "Early Warning Engine: Time-series anomaly detection across attendance, disciplinary notes, and grades to surface dropout/failure risks.",
+          "School Operations Summarizer: Automatically compiles weekly operations digests.",
+          "Policy & Communication Drafter: Drafts administrative announcements and safety alerts grounded in handbooks via RAG."
+        ]
+      },
+      {
+        "name": "Teacher Copilot (Curriculum & Grading Assistant)",
+        "capabilities": [
+          "Differentiated Lesson Planner: Creates multi-tiered lesson plans, quiz questions, and assignments.",
+          "Draft Evaluation & Rubric Scoring: Pre-grades essays and descriptive responses against a strict rubric.",
+          "Parent Update Generator: Summarizes individual student progress into constructive updates for parent-teacher meetings."
+        ]
+      },
+      {
+        "name": "Parent Assistant (Academic Interpreter)",
+        "capabilities": [
+          "Performance Translation: Converts report cards and homework metrics into plain-language actionable advice.",
+          "Multilingual Translation: Translates teacher notices, consent forms, and messages into the parent's primary language."
+        ]
+      },
+      {
+        "name": "Student Tutor (Grounded Study Companion)",
+        "capabilities": [
+          "Curriculum-Grounded Socratic Tutor: Provides guided hints from approved textbooks and notes via RAG without giving away direct answers.",
+          "Revision Schedule Optimizer: Generates adaptive revision quizzes based on past mistakes and upcoming exams."
+        ]
+      }
+    ],
+    "rag_and_vector_engine": {
+      "vector_db": "pgvector / Qdrant",
+      "embedding_model": "bge-small-en-v1.5",
+      "search_type": "Hybrid Search (Vector + Keyword)",
+      "partitioning": "Strict isolation by student grade, enrolled course IDs, and role permissions."
+    },
+    "inference_engines": {
+      "structured_reasoning": "Large coding and reasoning models for rubrics, report generation, multi-step policy tasks.",
+      "real_time_tutors": "Low-latency 3B to 7B parameter local models for interactive Q&A, spelling/grammar reviews, and quick Socratic suggestions."
+    },
+    "guardrails_and_compliance": {
+      "zero_pii_leakage": "PII (student IDs, contact details, medical records) is stripped or pseudonymized before prompts reach the inference engine.",
+      "system_prompt": "You are a safe, pedagogical assistant for school students. Never provide direct solutions to homework questions; provide conceptual hints. Cite strictly from verified course context provided. Immediately flag self-harm, harassment, or abuse signals to the school counselor.",
+      "audit_ledger": "All AI evaluations and communications log raw inputs, model metadata, and outputs to an immutable audit ledger."
+    }
+  }
+}
