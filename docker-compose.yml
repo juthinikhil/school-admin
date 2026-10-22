@@ -1,15 +1,20 @@
 version: '3.8'
 
 services:
-  auth:
-    build: ./auth
+  auth-service:
+    build: ./auth-service
     ports:
       - "8080:8080"
     environment:
       - JWT_SECRET=your_secret_key
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  academics:
-    build: ./academics
+  academic-service:
+    build: ./academic-service
     ports:
       - "8081:8081"
     environment:
@@ -17,9 +22,14 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=academics
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  attendance:
-    build: ./attendance
+  attendance-service:
+    build: ./attendance-service
     ports:
       - "8082:8082"
     environment:
@@ -27,6 +37,11 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=attendance
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   postgres:
     image: postgres:latest
@@ -34,3 +49,20 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=academics
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "postgres", "-U", "postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:latest
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  default:
+    driver: bridge
