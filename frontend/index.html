@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>School Administration & Learning Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #151d2f;
+      --border: #222f49;
+      --primary: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 1.5rem; max-width: 1100px; margin: auto; }
+    header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    h1 { font-size: 1.25rem; font-weight: 600; color: var(--primary); }
+    .role-badge { background: #1e293b; padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.85rem; border: 1px solid var(--border); color: #38bdf8; }
+    .nav { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .nav button { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+    .nav button.active { border-color: var(--primary); color: #fff; background: #1e293b; }
+    .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
+    .panel h2 { font-size: 1rem; margin-bottom: 0.8rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; color: #cbd5e1; }
+    .list-item { padding: 0.6rem 0; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; font-size: 0.9rem; }
+    .list-item:last-child { border-bottom: none; }
+    textarea { width: 100%; background: #0b0f19; border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem; color: #fff; resize: vertical; min-height: 80px; font-family: inherit; margin-top: 0.5rem; }
+    .btn-ai { background: #0284c7; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500; margin-top: 0.5rem; width: 100%; }
+    .ai-reply { margin-top: 0.8rem; background: #0b0f19; border: 1px solid var(--border); padding: 0.8rem; border-radius: 6px; font-size: 0.85rem; line-height: 1.4; white-space: pre-wrap; min-height: 50px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>School Admin Platform</h1>
+    <span class="role-badge" id="roleLabel">Role: Principal</span>
+  </header>
+
+  <div class="nav">
+    <button class="active" onclick="switchRole('Principal')">Principal</button>
+    <button onclick="switchRole('Teacher')">Teacher</button>
+    <button onclick="switchRole('Parent')">Parent</button>
+    <button onclick="switchRole('Student')">Student</button>
+  </div>
+
+  <div class="grid">
+    <!-- Domain Data Panel -->
+    <div class="panel">
+      <h2 id="sectionTitle">Academic & Administrative Data</h2>
+      <div id="contentList">Loading system metrics...</div>
+    </div>
+
+    <!-- AI Copilot Panel -->
+    <div class="panel">
+      <h2>AI Copilot (qwen2.5-coder:7b)</h2>
+      <p style="font-size: 0.8rem; color: var(--muted);" id="aiDesc">Institutional health, risk, and administrative assistance.</p>
+      <textarea id="aiInput" placeholder="Ask your copilot..."></textarea>
+      <button class="btn-ai" onclick="askAI()">Query Copilot</button>
+      <div class="ai-reply" id="aiOutput">AI response will appear here...</div>
+    </div>
+  </div>
+
+  <script>
+    let currentRole = 'Principal';
+
+    const DATA_ROLES = {
+      Principal: [
+        { label: 'Total Enrolled Students', value: '450' },
+        { label: 'Active Faculty Members', value: '38' },
+        { label: 'Tuition Collected (YTD)', value: '$540,000' },
+        { label: 'Average Daily Attendance', value: '94.2%' }
+      ],
+      Teacher: [
+        { label: 'CS101 - Intro to Programming', value: '32 Students' },
+        { label: 'MATH201 - Calculus II', value: '28 Students' },
+        { label: 'Pending Assignments to Grade', value: '14' },
+        { label: 'Daily Attendance Marked', value: 'Yes' }
+      ],
+      Parent: [
+        { label: 'Student', value: 'Alex Smith (Grade 10)' },
+        { label: 'Term Attendance', value: '96%' },
+        { label: 'Recent Grade (Math)', value: 'A- (91%)' },
+        { label: 'Pending Tuition Balance', value: '$0.00 (Paid)' }
+      ],
+      Student: [
+        { label: 'Enrolled Courses', value: '5 Courses' },
+        { label: 'Upcoming Exam', value: 'Calculus II (Nov 15)' },
+        { label: 'Next Due Assignment', value: 'Data Structures Lab 3' },
+        { label: 'Overall GPA', value: '3.85' }
+      ]
+    };
+
+    function switchRole(role) {
+      currentRole = role;
+      document.getElementById('roleLabel').innerText = 'Role: ' + role;
+      document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.innerText === role));
+
+      const list = document.getElementById('contentList');
+      list.innerHTML = DATA_ROLES[role].map(item => `
+        <div class="list-item">
+          <span style="color: var(--muted);">${item.label}</span>
+          <strong>${item.value}</strong>
+        </div>
+      `).join('');
+
+      const descMap = {
+        Principal: 'Institutional health, budget analytics, and staff summaries.',
+        Teacher: 'Syllabus builder, quiz design, and grading rubrics.',
+        Parent: 'Academic translator, student performance summaries.',
+        Student: 'Socratic revision tutor (conceptual guidance only).'
+      };
+      document.getElementById('aiDesc').innerText = descMap[role];
+      document.getElementById('aiOutput').innerText = 'AI response will appear here...';
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById('aiInput').value.trim();
+      if (!prompt) return;
+
+      const out = document.getElementById('aiOutput');
+      out.innerText = 'Analyzing with local 7B model...';
+
+      try {
+        const res = await fetch('/api/ai/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: currentRole, prompt: prompt })
+        });
+        const data = await res.json();
+        out.innerText = data.reply || data.error || 'No response returned.';
+      } catch (err) {
+        out.innerText = 'Error calling AI Gateway: ' + err.message;
+      }
+    }
+
+    switchRole('Principal');
+  </script>
+</body>
+</html>

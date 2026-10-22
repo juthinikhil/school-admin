@@ -1,18 +1,22 @@
 services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - auth-service
+      - academic-service
+      - attendance-service
+      - billing-service
+      - comms-service
+      - ai-service
+
   auth-service:
     build: ./auth-service
     ports:
       - "4000:4000"
     environment:
       - PORT=4000
-      - DATABASE_URL=postgresql://user:password@postgres:5432/identity_db
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=school-admin-secret-key
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
 
   academic-service:
     build: ./academic-service
@@ -20,10 +24,6 @@ services:
       - "4001:4001"
     environment:
       - PORT=4001
-      - DATABASE_URL=postgresql://user:password@postgres:5432/academic_db
-    depends_on:
-      postgres:
-        condition: service_healthy
 
   attendance-service:
     build: ./attendance-service
@@ -31,13 +31,32 @@ services:
       - "4002:4002"
     environment:
       - PORT=4002
-      - DATABASE_URL=postgresql://user:password@postgres:5432/attendance_db
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+
+  billing-service:
+    build: ./billing-service
+    ports:
+      - "4003:4003"
+    environment:
+      - PORT=4003
+
+  comms-service:
+    build: ./comms-service
+    ports:
+      - "4004:4004"
+    environment:
+      - PORT=4004
+
+  ai-service:
+    build: ./ai-service
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - OLLAMA_HOST=172.17.0.1
+      - OLLAMA_PORT=11434
+      - AI_MODEL=qwen2.5-coder:7b
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   postgres:
     image: postgres:16-alpine
