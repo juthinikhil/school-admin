@@ -1,0 +1,11 @@
+school-administration-system/
+├── auth/
+│   ├── Dockerfile
+│   └── ...
+├── academics/
+│   ├── Dockerfile
+│   └── ...
+├── attendance/
+│   ├── Dockerfile
+│   └── ...
+└── docker-compose.yml
